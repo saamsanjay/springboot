@@ -10,8 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 @Service
 public class GithubUserService {
 
@@ -28,6 +26,8 @@ public class GithubUserService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.set("User-Agent", "github-user-finder-app");
+        headers.set("X-GitHub-Api-Version", "2022-11-28");
 
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
@@ -45,7 +45,7 @@ public class GithubUserService {
 
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "GitHub user not found: " + username);
         } catch (HttpClientErrorException.NotFound e) {
-            throw new ResponseStatusException(NOT_FOUND, "GitHub user not found: " + username, e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "GitHub user not found: " + username, e);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Unable to fetch GitHub user information", e);
         }
